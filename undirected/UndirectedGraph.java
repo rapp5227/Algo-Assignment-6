@@ -1,5 +1,7 @@
 import java.util.*;
 
+// Authors: Chase Rapp and Abby Westphal
+
 public class UndirectedGraph {
 
     private ArrayList<UndirectedGraphNode> nodes;
@@ -11,7 +13,7 @@ public class UndirectedGraph {
 	 * graph.
 	 *
 	 * The graph will have a number of vertices equal to the length of the adjacency matrix.
-	 * 
+	 *
 	 * An edge from vertex i to vertex j exists if adjacencyMatrix[i][j] is true.
 	 * @param adjacencyMatrix a 2d boolean array representing an adjacency matrix.
 	 */
@@ -34,7 +36,7 @@ public class UndirectedGraph {
         }
 
     }// constructor
-    
+
     /**
 	 * Returns a string representation of all the nodes in the graph. The string
 	 * displays all of the data fields in the node.
@@ -43,7 +45,7 @@ public class UndirectedGraph {
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
+
 		// for every node
 		for (int i = 0; i < this.nodes.size(); i++) {
 			// append the string representation to the result.
@@ -52,7 +54,7 @@ public class UndirectedGraph {
 		}
 		return sb.toString();
     }// toString
-    
+
     private String getArrayData(LinkedList<UndirectedGraphNode> output) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -65,17 +67,17 @@ public class UndirectedGraph {
         sb.append("]");
         return sb.toString();
     }
-    
+
     /**
 	 * Retrieves the number of nodes in the Graph.
-	 * 
+	 *
 	 * @return the number of nodes in the graph.
 	 */
 	public int getGraphSize() {
 		return this.nodes.size();
 	}// getGraphSize
-    
-    
+
+
     /**
 	 * adds the node other as a neighbor to root.
 	 *
@@ -105,10 +107,10 @@ public class UndirectedGraph {
         if (!connectNodeB.hasAdjacentNode(connectNodeA)) {
             connectNodeB.addAdjacentNode(connectNodeA);
         }
-        
+
 
 	}// connect
-    
+
     private UndirectedGraphNode findNode(int data) {
 		if(0 <= data && data < this.nodes.size()){
 			return nodes.get(data);
@@ -116,25 +118,63 @@ public class UndirectedGraph {
 			return null;
 		}
     }// findNode
-    
+
     /**
      * This method takes data for a starting node and ending node and returns the number of unique shortest paths between them.
-     * For example, if the the shortest path between nodes 1 and 5 is 3, and there is only ONE path of length 3, this method will 
+     * For example, if the the shortest path between nodes 1 and 5 is 3, and there is only ONE path of length 3, this method will
      * return 1.  However, if there are 4 different paths that lead from 1 to 5 that are all length 3, this method will return 4.
 	 * If there is not a path between start and end, this method should return 0
-	 * 
+	 *
      * @param start
      * @param end
      * @return
      */
     public int numShortestPaths(int start, int end) {
 
-		//ADD YOUR CODE HERE
+		Integer[] dist = new Integer[getGraphSize()];
+		dist[start] = 0;
+		UndirectedGraphNode[] prev = new UndirectedGraphNode[getGraphSize()];
+		int[] num_paths = new int[getGraphSize()];
+		num_paths[start] = 1;
 
-        return 0;
+		LinkedList<UndirectedGraphNode> queue = new LinkedList<UndirectedGraphNode>();
+
+		queue.add(this.findNode(start));
+
+		while(queue.peek() != null)
+		{
+			UndirectedGraphNode node = queue.remove();
+
+			ListIterator<UndirectedGraphNode> it = node.getAdjacentNodes().listIterator();
+
+			while(it.hasNext())
+			{
+				UndirectedGraphNode current = it.next();
+
+				if(dist[current.getData()] == null)	// node has not been visited
+				{
+					queue.add(current);
+
+					dist[current.getData()] = dist[node.getData()] + 1;
+					prev[current.getData()] = node;
+					num_paths[current.getData()] = num_paths[node.getData()];
+
+					// System.out.println("found " + current.getData() + " for the first time from " + node.getData());
+				}
+
+				else if(dist[current.getData()] == dist[node.getData()] + 1)
+				{
+					num_paths[current.getData()] += num_paths[node.getData()];
+
+					// System.out.println("found " + current.getData() + " again from " + node.getData());
+				}
+			}
+		}
+
+        return num_paths[end];
     }
-    
-    
+
+
     private static class UndirectedGraphNode {
         private int data;
         private LinkedList<UndirectedGraphNode> adjacentNodes;
